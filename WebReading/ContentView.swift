@@ -9,24 +9,59 @@ import SwiftUI
 
 struct ContentView: View {
     
+    // ENUM with Associated value
+    
+    enum NavigationSelection: Identifiable , Hashable {
+        case pdf(url: URL)
+        case readingItem(item: ReadingItem)
+
+        var id: String {
+            switch self {
+            case .pdf(let url):
+                return url.absoluteString
+            case .readingItem(let item):
+                return item.id.uuidString
+            }
+        }
+    }
+    
 //    let readingList : [ReadingItem] = ReadingItem.examples
-    @State private var selection: ReadingItem? = nil
+    @State private var selection: NavigationSelection? = nil
     // MARK: Need to update @State to @StateObject ,also R&D on this
     @State private var readingViewModel = ReadingDataViewModel()
+    @State private var pdfViewModal = PDFViewModel()
+    @State private var newReadingEdiorIsShown: Bool = false
+    
     @Environment(\.scenePhase) var scenePhase
     
     var body: some View {
+        
         NavigationSplitView {
-            ReadingListView(readingViewModel:readingViewModel ,selection: $selection)
+            List(selection: $selection){
+                PDFSectionView(pdfViewModal: pdfViewModal )
+                ReadingSectionView(readingViewModel:readingViewModel)
+            }
+            .toolbar {   // 👈 now only once
+                Button {
+                    newReadingEdiorIsShown.toggle()
+                } label: {
+                    Label("Add New Reading Item", systemImage: "plus")
+                }
+
+                EditButton()
+            }
+            .sheet(isPresented: $newReadingEdiorIsShown) {
+                ReadingDataEditorView(readingViewModel: readingViewModel)
+            }
         } detail: {
-            
-            // Guard is early exit can not work with Views, but can wrok with funcitons
-//            guard selection != nil {
-//                ContentUnavailableView("Select a Reading Item",systemImage: "book")
-//            }
-//            Text(selection.title)
             if let selection {
-                ReadingDetailView(reading: selection, readingViewModel: readingViewModel)
+                switch selection {
+                case .pdf(let url):
+                    PDFDetailViewer(fileURL: url, pdfViewModel: pdfViewModal)
+                case .readingItem(let item):
+                    ReadingDetailView(reading: item, readingViewModel: readingViewModel)
+                }
+                
             } else{
                 ContentUnavailableView("Select a Reading Item",systemImage: "book")
             }

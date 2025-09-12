@@ -19,7 +19,9 @@ struct WebView: UIViewRepresentable {
     func makeUIView(context: Context) ->  WKWebView {
         print("makeUIView")
         let view =  WKWebView()
+        print("before load")
         load(view)
+        print("after load")
 //        view.load(URLRequest(url:url))
         view.navigationDelegate = context.coordinator
         webViewState.webView = view
@@ -28,9 +30,6 @@ struct WebView: UIViewRepresentable {
     
     func updateUIView(_ uiView: WKWebView, context: Context) {
         // MARK: Checking current is same as previous or not
-        print("upateuiview")
-        print("uiView.url \(uiView.url)")
-        print("webViewState \(webViewState.url)")
         guard let url = webViewState.url else { return }
         
         if uiView.url == nil {

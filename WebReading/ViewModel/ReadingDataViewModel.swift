@@ -5,7 +5,7 @@ import Observation
 @Observable
 class ReadingDataViewModel {
     
-    var readingList: [ReadingItem] = ReadingItem.examples
+    var readingList: [ReadingItem] = []
     
     init() {
 //        load()
@@ -27,10 +27,42 @@ class ReadingDataViewModel {
         save()
     }
    
+    // MARK: Create path in Support Directory
+    
+//    •    App Sandbox = your app’s private jail.
+//    •    Documents Directory = user-visible, backed up.
+//    •    Application Support Directory = app’s private storage, backed up.
+//    •    Caches/tmp = temporary, system may delete.
+//    •    FileManager is used to find and manage these folders in a safe,
+//    system-approved way (because paths can change depending on device, iOS version, etc.).
+    
+    func supportDirectory() -> URL? {
+        // MARK: this function ensures the folder exists.
+        do {
+          return try FileManager.default.url(for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            
+        } catch {
+            print("Error creating support directory : \(error)")
+            return nil
+        }
+    }
     
     func fileURl() -> URL {
-        let directory = URL.documentsDirectory
-        return directory.appendingPathComponent("readingList.json")
+//        let directory = supportDirectory() ??  URL.documentsDirectory
+//
+//        let directory = URL.applicationSupportDirectory
+//        return directory.appendingPathComponent("readingList.json")
+        
+        
+        let directory = URL.applicationSupportDirectory
+        // ensure Application Support exists
+            try? FileManager.default.createDirectory(
+                at: directory,
+                withIntermediateDirectories: true,
+                attributes: nil
+            )
+            
+            return directory.appendingPathComponent("readingList.json")
     }
     
     // MARK: Save data into list
@@ -42,7 +74,7 @@ class ReadingDataViewModel {
             print("file location \(url.absoluteString)")
             
         } catch {
-            print("error \(error)")
+            print("error while save is :  \(error)")
         }
     }
     

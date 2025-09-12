@@ -1,9 +1,3 @@
-//
-//  ReadingDetailView.swift
-//  WebReading
-//
-//  Created by MACM72 on 05/09/25.
-//
 
 import SwiftUI
 
@@ -18,9 +12,10 @@ struct ReadingDetailView: View {
         VStack{
             ZStack {
                 // TODO: Add WebView
+            
                 WebView(webViewState: webViewState)
                     .ignoresSafeArea()
-                
+             
                 if webViewState.isLoading {
                      ProgressView()
                          .controlSize(.large)
@@ -30,6 +25,19 @@ struct ReadingDetailView: View {
                     Text(error.localizedDescription)
                         .foregroundStyle(.pink)
                 }
+                
+                if let url = webViewState.successGeneratePDFURL {
+                    SuccessSaveFileView(url: url)
+                        .transition(.move(edge: .bottom))
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                                withAnimation(.bouncy(duration: 2)){
+                                    webViewState.successGeneratePDFURL = nil
+                                }
+                            }
+                        }
+                }
+                
             }
             WebNavigatonBar(webViewState: webViewState)
                 .padding()
@@ -43,19 +51,30 @@ struct ReadingDetailView: View {
             webViewState.userRequestedToOpen(reading.url)
         }
         .toolbar {
-            if let new  = webViewState.currentURL ,
-            webViewState.url != new {
-                Button("Create New Reading"){
-                    readingViewModel.addNewReadingItem(title: webViewState.currentTitle ?? "title", url: new)
+            Menu("More",systemImage:"ellipsis.circle" ){
+                if let new  = webViewState.currentURL ,
+                   webViewState.url != new {
+                    Button("Create New Reading"){
+                        readingViewModel.addNewReadingItem(title: webViewState.currentTitle ?? "title", url: new)
+                    }
                 }
+                
+                Button(action: {
+                    webViewState.createPDF()
+                }, label: {
+                    Text("Save as PDF")
+                })
+                
             }
-            
         }
         
     }
 }
 
 #Preview {
-    ReadingDetailView(reading: ReadingItem.example , readingViewModel: ReadingDataViewModel() )
+    NavigationStack{
+        ReadingDetailView(reading: ReadingItem.example , readingViewModel: ReadingDataViewModel())
+    }
+   
 }
 
