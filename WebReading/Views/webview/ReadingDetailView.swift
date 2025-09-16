@@ -31,17 +31,21 @@ struct ReadingDetailView: View {
                         .transition(.move(edge: .bottom))
                         .onAppear {
                             DispatchQueue.main.asyncAfter(deadline: .now() + 3){
+                                print("🟡 Hiding SuccessSaveFileView...")
                                 withAnimation(.bouncy(duration: 2)){
                                     webViewState.successGeneratePDFURL = nil
                                 }
                             }
                         }
+                        .onDisappear {
+                                    print("❌ SuccessSaveFileView DISAPPEARED")
+                    }
                 }
                 
             }
-            WebNavigatonBar(webViewState: webViewState)
-                .padding()
-                .background(.thinMaterial)
+//            WebNavigatonBar(webViewState: webViewState)
+//                .padding()
+//                .background(.thinMaterial)
         }
 //        .onChange(of: webViewState) { old, new in ... } //  doesn't work
         .onChange(of: reading){ oldValye, newValue in

@@ -21,7 +21,7 @@ struct SuccessSaveFileView: View {
             .frame(maxWidth: .infinity,maxHeight: .infinity,alignment: .bottom)
             .padding(50)
             .padding(.bottom ,0)
-            .transition(.move(edge: .bottom))
+//            .transition(.move(edge: .bottom))
     }
 }
 

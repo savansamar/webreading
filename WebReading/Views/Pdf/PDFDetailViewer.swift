@@ -23,6 +23,8 @@ struct PDFDetailViewer: View {
                 } label: {
                     Label("Delete", systemImage: "trash")
                 }
+                
+                ShareLink(item:fileURL)
             }
     }
 }
